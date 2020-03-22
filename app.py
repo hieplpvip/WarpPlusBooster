@@ -21,7 +21,7 @@ def getProxy():
 
 def register(threadName, proxy):
   install_id = genString(11)
-  path = 'v0a{}/reg'.format(random.randint(750, 790))
+  path = 'v0a{}/reg'.format(random.randint(100, 999))
   
   postData = json.dumps({
     'key': '{}='.format(genString(43)),

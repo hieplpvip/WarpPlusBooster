@@ -1,0 +1,5 @@
+curl --request POST \
+     --header "Content-Type: application/json" \
+     --header "User-Agent: okhttp/3.12.1" \
+     --data '{"referrer":"0e1afb51-3ad8-4392-8aa2-13a8b0e7173b"}' \
+     https://api.cloudflareclient.com/v0a175/reg
