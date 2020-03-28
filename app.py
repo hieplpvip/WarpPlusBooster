@@ -22,7 +22,7 @@ def getProxy():
 def register(threadName, proxy):
   install_id = genString(11)
   path = 'v0a{}/reg'.format(random.randint(100, 999))
-  
+
   postData = json.dumps({
     'key': '{}='.format(genString(43)),
     'install_id': install_id,
@@ -33,7 +33,7 @@ def register(threadName, proxy):
     'type': 'Android',
     'locale': 'vi_VN'
   }, separators = (',', ':')).encode('utf8')
-  
+
   headers = {
     'Host': 'api.cloudflareclient.com',
     'Accept': '*/*',
@@ -41,12 +41,12 @@ def register(threadName, proxy):
     'Content-Type': 'application/json',
     'Content-Length': str(len(postData))
   }
-  
+
   try:
     req = urllib.request.Request('https://api.cloudflareclient.com/' + path, headers = headers, data = postData)
     req.set_proxy(proxy, 'http')
     response = urllib.request.urlopen(req, timeout = timeout)
-    
+
     if response.getcode() == 200 and referrerID in response.read().decode('utf8'):
       print('{}: Earned 1GB using path {} and proxy {}'.format(threadName, path, proxy))
       global totalEarned
@@ -70,19 +70,19 @@ def mainRun():
     print('Scraping proxies...')
     proxies = getProxy()
     print('Got {} proxies'.format(len(proxies)))
-    
+
     threads = []
     for i in range(num_of_threads):
       thread = threading.Thread(target = registerWrapper, args = ('Thread-{}'.format(i + 1), proxies, i))
       thread.start()
       threads.append(thread)
-    
+
     for x in threads:
       x.join()
 
 if __name__ == '__main__':
   thread = threading.Thread(target = mainRun)
   thread.start()
-  
+
   port = int(os.environ.get('PORT', 5000))
   app.run(host = '0.0.0.0', port = port)
