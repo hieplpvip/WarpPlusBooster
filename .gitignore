@@ -1,2 +1,4 @@
 venv/
 *pycache*
+wgcf-identity.json
+wgcf-profile.conf
