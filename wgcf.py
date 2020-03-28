@@ -21,7 +21,7 @@ default_headers = {"Accept-Encoding": "gzip",
                    "User-Agent": "okhttp/3.12.1"}
 
 # toggle to allow sniffing traffic
-debug = True
+debug = False
 
 def get_verify() -> bool:
   return not debug
@@ -46,6 +46,7 @@ class ConfigurationData():
   warp_enabled: bool
   account_type: str
   warp_plus_enabled: bool
+  quota: str
 
 def get_timestamp() -> str:
   # SimpleDateFormat("yyyy-MM-dd\'T\'HH:mm:ss", Locale.US)
@@ -102,6 +103,13 @@ def enable_warp(account_data: AccountData):
   response = json.loads(response.content)
   assert response["warp_enabled"] == True
 
+def sizeof_fmt(num, suffix='B'):
+  for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
+    if abs(num) < 1000.0:
+      return "%3.1f%s%s" % (num, unit, suffix)
+    num /= 1000.0
+  return "%.1f%s%s" % (num, 'Y', suffix)
+
 def get_server_conf(account_data: AccountData) -> ConfigurationData:
   headers = default_headers.copy()
   headers["Authorization"] = f"Bearer {account_data.access_token}"
@@ -118,9 +126,10 @@ def get_server_conf(account_data: AccountData) -> ConfigurationData:
   account = response["account"] if "account" in response else ""
   account_type = account["account_type"] if account != "" else "free"
   warp_plus = account["warp_plus"] if account != "" else False
+  quota = sizeof_fmt(account["quota"]) if account != "" else "0GB"
 
   return ConfigurationData(addresses["v4"], addresses["v6"], endpoint["host"], endpoint["v4"],
-               endpoint["v6"], peer["public_key"], response["warp_enabled"], account_type, warp_plus)
+               endpoint["v6"], peer["public_key"], response["warp_enabled"], account_type, warp_plus, quota)
 
 def get_wireguard_conf(private_key: str, address_1: str, address_2: str, public_key: str, endpoint: str) -> str:
   return f"""
@@ -171,6 +180,7 @@ if __name__ == "__main__":
 
   print(f"Account type: {conf_data.account_type}")
   print(f"Warp+ enabled: {conf_data.warp_plus_enabled}")
+  print(f"Quota: {conf_data.quota}")
 
   print("Creating WireGuard configuration...")
   create_conf(account_data, conf_data)
